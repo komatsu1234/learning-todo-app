@@ -129,10 +129,28 @@ type User = {
 `age?`はあってもなくてもよい値
 
 ### 8. Union型（よく使う）
+
+#### プリミティブ型　文字列か数値を許容
 ```ts
+// 変数宣言
 let id: string | number
+
+// 型定義
+type Status = string | number
 ```
-→ string か number どちらか
+#### リテラル型 特定の値のみ許容
+```ts
+type Status = "active" | "inactive" | "deleted";
+
+let userStatus: Status = "active" // 〇 OK
+let userStatus: Status = "pending" // × 定義にない
+```
+
+#### プリミティブ　×　リテラル　組み合わせ
+```ts
+// "admin" という特定の文字か、数値のIDを受け付ける
+type AdminIdentifier = "admin" | number;
+```
 
 ## 応用
 ### 1. 型は「ドメイン単位」で作る
@@ -161,21 +179,143 @@ export type User = {
 
 ### 2. DTO / Entity を分ける
 
-#### Entity
+#### DTO（リクエスト・レスポンス側の定義）
 
-**DBのデータ構造**
+**APIでやり取りする型**
 
+##### ユーザー作成リクエスト
 ```ts
-export type UserEntity = {
+export type CreateUserDto = {
+  name: string
+  email: string
+  password: string // 生パスワード
+}
+```
+
+##### ユーザー作成レスポンス
+```ts
+export type UserResponseDto = {
   id: string
   name: string
   email: string
-  password_hash: string
-  created_at: Date
 }
 ```
 
 
+
+#### Entity（DB側の定義）
+
+1. **DBのデータ構造に合わせて定義する**
+2. **DB保存前と保存後で同じ Entity を利用する**
+
+```ts
+export type UserEntity = {
+  id: string | undefined // DB保存前はidがまだないため`undefined`
+  name: string
+  email: string
+  password_hash: string // password_hash に変換して保持
+  created_at: Date
+}
+```
+#### 実務構造
+```
+users
+
+user.entity.ts
+user.dto.ts
+user.service.ts
+```
+
+### 3. Zod
+
+- 型定義とバリデーションを定義できるスキーマライブラリ
+- Entityは「アプリ内部で信頼されたデータ」なので、Zodを通さずシンプルな型定義にすることが多い。
+
 #### DTO
 
-**APIでやり取りする型**
+`user.dto.ts`
+
+```ts
+import { z } from `zod`;
+
+// --- リクエスト (Zod Schema) ---
+export const CreateUserSchema = z.object({
+  name: z.string().min(1, "名前は必須です"),
+  email: z.string().email("不正なメール形式です"),
+  password: z.string().min(8, "8文字以上で入力してください"),
+});
+
+// Zodから型を抽出
+export type CreateUserDto = z.infer<typeof CreateUserSchema>;
+
+// --- レスポンス (Zod Schema) ----
+export const UserResponseSchema = z.object({
+  id: z.string().uuid();
+  name: z.string(),
+  email: z.string().email(),
+});
+
+export type UserResponseDto = z.infer<typeof UserResponseSchema>;
+
+```
+
+### 4. Utility Types
+
+- **「正解となる型（真実のソース）」**を一つに決め、そこから派生させる方法
+- **二重管理を防ぎ**つつ、必要な項目だけを抽出・変更できる
+
+
+#### 1つの型定義（Entityなど）
+```ts
+type User = {
+  id: string
+  name: string
+  email: string
+  password: string
+}
+
+```
+
+#### Pick
+
+必要なプロパティだけを抽出する
+
+```ts
+// idとnameのみ抽出
+idとnameのみ
+type UserPublic = Pick<User, "id" | "name">
+```
+
+#### Omit
+
+指定プロパティを除く
+
+```ts
+// passwordを除く
+type UserPublic = Omit<User, "password">
+```
+
+#### Partial
+全部 optional (任意)　になる
+
+```ts
+// `name`と`email`だけ抽出するがその二つはオプショナル
+type UpdateUserDto = Partial<Pick<User, "name" | "email">>
+```
+
+### 5. unknown (any禁止)
+- `any`: TypeScriptを無効化する型
+- `unknown`: 型が不明の状態で代入できるが取り出す前にチェックを強制する
+
+```ts
+let value: unknown = "hello";
+
+// value.push(1) × エラーになる
+
+// 〇 型チェックをすれば使える
+if (typeof value === "string") {
+  console.log(value.length);
+}
+
+```
+
