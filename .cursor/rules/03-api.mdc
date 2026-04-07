@@ -1,0 +1,31 @@
+---
+description: Todo CRUD API設計ルール
+globs: **/*.{ts,md}
+alwaysApply: false
+---
+
+# API Rules
+
+## 最小 API
+- `POST /todos`
+- `GET /todos`
+- `GET /todos/:id`
+- `PATCH /todos/:id`
+- `DELETE /todos/:id`
+
+## ルール
+- ステータスコードは意味に合わせる（201/200/204/400/404）。
+- エラーレスポンスは構造を統一する。
+- パラメータ/ボディは必ず Zod で検証してから service に渡す。
+
+## NG / OK
+```ts
+// ❌ NG: 失敗時も 200
+return res.status(200).json({ message: "not found" });
+
+// ✅ OK: 意味に合う 404
+return res.status(404).json({ error: "Todo not found" });
+```
+
+## Why
+API 契約が明確だと、テストとクライアント実装が安定する。

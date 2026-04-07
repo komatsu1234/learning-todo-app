@@ -1,0 +1,30 @@
+---
+description: 単体テストと結合テストの必須ルール
+globs: **/*.{test,spec}.ts
+alwaysApply: false
+---
+
+# Testing Rules
+
+## 必須
+- service の単体テストを先に書く。
+- CRUD API の結合テストを書く。
+- 正常系だけでなく異常系（400/404）も検証する。
+
+## NG / OK
+```ts
+// ❌ NG: 正常系だけ
+it("create todo", async () => {
+  const res = await request(app).post("/todos").send({ title: "x" });
+  expect(res.status).toBe(201);
+});
+
+// ✅ OK: 異常系も確認
+it("returns 400 when title is empty", async () => {
+  const res = await request(app).post("/todos").send({ title: "" });
+  expect(res.status).toBe(400);
+});
+```
+
+## Why
+異常系までテストすると、リファクタリング時の回帰を防げる。

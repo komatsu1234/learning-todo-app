@@ -1,0 +1,26 @@
+---
+description: Zodバリデーション運用ルール
+globs: **/*.{ts,tsx}
+alwaysApply: false
+---
+
+# Zod Rules
+
+## 基本
+- 入力検証は Zod に一本化する。
+- `z.infer` で型を生成し、型定義を二重管理しない。
+- controller で parse し、service には検証済みデータを渡す。
+
+## NG / OK
+```ts
+// ❌ NG: Zod と手書き型の二重管理
+const CreateTodoSchema = z.object({ title: z.string() });
+type CreateTodoDto = { title: string };
+
+// ✅ OK: Zod から型を生成
+const CreateTodoSchema = z.object({ title: z.string().min(1) });
+type CreateTodoDto = z.infer<typeof CreateTodoSchema>;
+```
+
+## Why
+スキーマを唯一の真実にすると、仕様変更時の不整合を防げる。

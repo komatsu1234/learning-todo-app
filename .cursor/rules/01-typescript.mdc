@@ -1,0 +1,36 @@
+---
+description: TypeScriptの型安全ルール
+globs: **/*.{ts,tsx}
+alwaysApply: false
+---
+
+# TypeScript Rules
+
+## 基本
+- 入出力の型を明示し、推論任せにしすぎない。
+- Union 型や `unknown` で安全に絞り込む。
+- `any` は禁止。必要なら型ガードを作る。
+
+## NG / OK
+```ts
+// ❌ NG
+function parse(body: any) {
+  return body.title;
+}
+
+// ✅ OK
+function parse(body: unknown): { title: string } {
+  if (
+    typeof body === "object" &&
+    body !== null &&
+    "title" in body &&
+    typeof (body as { title: unknown }).title === "string"
+  ) {
+    return { title: (body as { title: string }).title };
+  }
+  throw new Error("Invalid body");
+}
+```
+
+## Why
+型安全を徹底すると、実行時バグより前にコンパイル時に問題を発見できる。

@@ -1,0 +1,33 @@
+---
+description: Express MVC責務分離ルール
+globs: **/*.ts
+alwaysApply: false
+---
+
+# Architecture Rules
+
+MVC を守る: Controller は薄く、Service にロジック、Repository に Prisma。
+
+## 責務
+- Controller: リクエスト/レスポンス変換とエラーハンドリングのみ。
+- Service: ユースケースと業務ルールを実装。
+- Repository: DB 永続化のみ。
+
+## NG / OK
+```ts
+// ❌ NG: controller に業務ロジック
+export const createTodo = async (req, res) => {
+  if (req.body.title.length < 3) return res.status(400).send();
+  const todo = await prisma.todo.create({ data: req.body });
+  res.json(todo);
+};
+
+// ✅ OK: controller は service 呼び出しだけ
+export const createTodo = async (req, res) => {
+  const todo = await todoService.create(req.body);
+  res.status(201).json(todo);
+};
+```
+
+## Why
+責務分離するとテストしやすくなり、将来 NestJS へ移行する時も構造を保ちやすい。
