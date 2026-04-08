@@ -11,6 +11,12 @@ alwaysApply: false
 - service は repository インターフェース経由で呼ぶ。
 - トランザクションは「複数更新が一体」の時だけ使う。
 
+## 現場セオリー（最小）
+- **スキーマは契約**: `NOT NULL` / `UNIQUE` など、破られると致命的な制約は DB（Prisma schema）で表現する。
+- **タイムスタンプ**: `createdAt` は `@default(now())`、`updatedAt` は `@updatedAt` を基本とする。
+- **マイグレーション管理**: 変更は必ず migration に残す（手動DDLでの“漂流”を避ける）。
+- **文字数制約の扱い**: まずは Zod で決め、必要になったら DB でも `@db.VarChar(n)` などで強制する。
+
 ## NG / OK
 ```ts
 // ❌ NG: service で直接 prisma
