@@ -10,6 +10,7 @@ alwaysApply: false
 - Prisma Client は repository 層だけで使う。
 - service は repository インターフェース経由で呼ぶ。
 - トランザクションは「複数更新が一体」の時だけ使う。
+- スキーマ提案時は列ごとに 理由: を明記する。
 
 ## 現場セオリー（最小）
 - **スキーマは契約**: `NOT NULL` / `UNIQUE` など、破られると致命的な制約は DB（Prisma schema）で表現する。
