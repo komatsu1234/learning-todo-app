@@ -22,8 +22,14 @@ export const create = async (data: { title: string, description?: string }) => {
 };
 
 // タスク更新
-export const update = async (id: number) => {
+export const update = async (id: number, data: { title?: string, description?: string, complited?: boolean }) => {
   return await prisma.todo.update({
-    where: 
+    where: { id },
+    data: data // 渡されたデータのみ更新される
   });
+};
+
+// タスク一件削除
+export const deleteById = async (id: number) => {
+  return await prisma.todo.delete({ where: { id } });
 };
