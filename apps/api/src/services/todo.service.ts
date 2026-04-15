@@ -28,7 +28,7 @@ export const createTodo = async (title: string, description?: string) => {
 export const updateTodo = async (id: number, data: {title: string, description: string, completed: boolean}) => {
   // 更新前に存在をチェック
   await getTodoById(id);
-  return await todoRepository.update;
+  return await todoRepository.update(id, data);
 };
 
 // タスク削除

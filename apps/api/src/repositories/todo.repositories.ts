@@ -2,7 +2,7 @@
  * リポジトリ層
  * データベース操作を実装する
  */
-import { PrismaClient, ToDo } from `@prisma/client`;
+import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
