@@ -15,5 +15,5 @@ src/
 
 ## バリデーション
 ### CreateTodoSchema
-- title: string (min: 1, max: 200)
+- title: string (min: 1, max: 100)
 - description: string (optional, max: 500)
