@@ -7,10 +7,13 @@ export const createTodoSchema = z.object({
 });
 
 
-// ID（パスパラメータ）のバリデーション
-export const todoIdSchema = z.object({
+/**
+ * ID（パスパラメータ）のバリデーション
+ * corers(): 
+ *  */
+export const idSchema = z.object({
   prams: z.object({
-    id: z.numger(),
+    id: z.corers().number().int().positive(),
   }),
 });
 
