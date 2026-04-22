@@ -82,6 +82,19 @@ const greet = (name: string): string => {
 | export関数    | 明示     |
 | API / service | 明示     |
 
+### 5. ジェネリクス
+
+型を引数のように呼び出し先に渡す機能
+
+```ts
+// 型の変数 "T" は "string" として引数と戻り値に使用している
+const echo<T>(value: T): T {
+  return value;
+}
+
+const result = echo<string>("こんにちは");
+```
+
 ### 5. オブジェクト型
 - 型に名前を付ける場合に利用する
 - オブジェクト型は空で始めたり後から入れることが多いため型推論より型を定義することが多い
