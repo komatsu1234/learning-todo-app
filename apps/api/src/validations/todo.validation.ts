@@ -23,7 +23,7 @@ export const idSchema = z.object({
   params: z.object({
     id: z.coerce.number().int().positive(),
   })
-})
+});
 
 // 型として定義
 export type idInput = z.infer<typeof idSchema>;
