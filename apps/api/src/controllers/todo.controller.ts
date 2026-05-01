@@ -33,6 +33,10 @@ export const getOne = async (req: Request, res: Response) => {
 // タスク作成
 export const create = async (req: Request, res: Response) => {
   try {
+    const parsed = createTodoSchema.safeParse(req.body);
+    if(!parsed.success){
+      return 
+    }
     const { title, description } = req.body;
     const newTodo = await todoService.createTodo(title, description);
     res.status(201).json(newTodo);
